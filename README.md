@@ -6,6 +6,16 @@ The utility performs logical acquisition over USB or parses unencrypted local iT
 
 ---
 
+<details>
+<summary><strong>Screenshots (Web UI)</strong></summary>
+<br />
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/9a5b36e4-4bdb-4385-81a0-f8dd2aca9518" alt="Source selection" width="850" />
+  <br /><br />
+  <img src="https://github.com/user-attachments/assets/c397a6fe-b955-42ba-b353-b10ddf804eed" alt="Inventory view" width="850" />
+</div>
+</details>
+
 ## Acquisition Sources
 
 - **Direct USB Connection:** Communicates directly with `DCIM` and `PhotoData` via a custom C++ implementation of the Apple USB stack (`usbmuxd`, `lockdownd` over TLS, and `AFC` restricted strictly to read-only opcodes). Requires one-time host pairing (*Trust*) and the Apple Mobile Device Service (via Apple Devices or iTunes on Windows).
