@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iPhone Forensics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+    <div class="mark">iPhone Forensics</div>
+    <button id="lang" class="ghost"></button>
+</header>
+
+<nav id="steps">
+    <button data-step="1" class="active"><i>1</i><span data-i18n="nav1">Prepare</span></button>
+    <button data-step="2"><i>2</i><span data-i18n="nav2">Source</span></button>
+    <button data-step="3"><i>3</i><span data-i18n="nav3">Workspace</span></button>
+    <button data-step="4" disabled><i>4</i><span data-i18n="nav4">Inventory</span></button>
+    <button data-step="5" disabled><i>5</i><span data-i18n="nav5">Deleted</span></button>
+    <button data-step="6" disabled><i>6</i><span data-i18n="nav6">Export</span></button>
+</nav>
+
+<div id="progress" hidden>
+    <div class="bar"><i></i></div>
+    <span id="phase"></span>
+    <details><summary data-i18n="log">Log</summary><pre id="log"></pre></details>
+</div>
+<p id="error" class="alert" hidden></p>
+
+<main>
+<section id="step1">
+    <h2 data-i18n="s1h">Prepare</h2>
+    <p data-i18n="s1p">Two sources are supported. Both read only; nothing is sent to iCloud or the internet.</p>
+    <h3 data-i18n="s1a">A. Connect the iPhone</h3>
+    <ol class="guide">
+        <li data-os="windows" data-i18n="s1a1">Install Apple Devices (Microsoft Store) or iTunes for the USB driver and the Apple Mobile Device Service.</li>
+        <li data-i18n="s1a2">Connect by cable, unlock the iPhone, and tap Trust. The passcode is entered on the iPhone only, never here.</li>
+        <li data-i18n="s1a3">Close the Photos app while reading so the photo database does not change mid-copy.</li>
+    </ol>
+    <h3 data-i18n="s1b">B. Use a local, unencrypted backup</h3>
+    <ol class="guide">
+        <li data-i18n="s1b1">Preserve existing backups: archive them in Apple Devices / Finder, or copy the whole folder unchanged. A newer backup can overwrite an older one.</li>
+        <li data-i18n="s1b2">An encrypted backup cannot be inspected. Turning encryption off removes passwords, Wi-Fi and Health data from future backups.</li>
+        <li data-i18n="s1b3">With iCloud Photos on, the library is not in computer backups, so few photos may be found.</li>
+        <li data-os="macos" data-i18n="s1b4">macOS protects the backup folder: grant Full Disk Access to the terminal running this tool.</li>
+    </ol>
+    <button data-step="2" class="primary" data-i18n="cont">Continue</button>
+</section>
+
+<section id="step2" hidden>
+    <h2 data-i18n="s2h">Select a source</h2>
+    <h3 data-i18n="s2c">Connected iPhone</h3>
+    <p class="hint" data-i18n="s2ch">Connect and unlock the iPhone; it appears here on its own. Read directly over USB, no backup needed.</p>
+    <div id="devices"></div>
+    <h3 data-i18n="s2b">Existing backup</h3>
+    <ul id="roots"></ul>
+    <form id="scan-form" class="row">
+        <input id="custom" data-i18n-ph="s2ph" placeholder="Custom backup folder, or a folder of backups">
+        <button class="primary" data-i18n="scan">Scan</button>
+    </form>
+    <div id="encrypted" class="alert" hidden data-i18n="s2enc">Encrypted backups were found. Their databases are not inspected, and backup passwords are never requested.</div>
+    <div id="backups"></div>
+</section>
+
+<section id="step3" hidden>
+    <h2 data-i18n="s3h">Audit workspace</h2>
+    <dl id="selected"></dl>
+    <label for="base" data-i18n="s3l">Workspace location</label>
+    <div class="row"><input id="base"><button id="start" class="primary" disabled data-i18n="s3go">Start analysis</button></div>
+    <p class="hint" data-i18n="s3hint">A timestamped folder with working/, exports/ and reports/ is created here. Keep it out of OneDrive, iCloud Drive, Dropbox and Google Drive.</p>
+    <div id="cloud" class="alert" hidden></div>
+    <h3 data-i18n="s3int">Source integrity (SHA-256)</h3>
+    <div id="hashes"></div>
+</section>
+
+<section id="step4" hidden>
+    <h2 data-i18n="s4h">Inventory</h2>
+    <div class="cards" id="inv-cards"></div>
+    <h3 data-i18n="s4cat">By category</h3><div id="by-category"></div>
+    <h3 data-i18n="s4dom">By domain</h3><div id="by-domain"></div>
+    <h3 data-i18n="s4fol">By folder</h3><div id="by-folder"></div>
+    <p class="hint" data-i18n="s4csv">Full list: reports/inventory.csv</p>
+</section>
+
+<section id="step5" hidden>
+    <h2 data-i18n="s5h">Recently Deleted</h2>
+    <p id="photo-status"></p>
+    <h3 data-i18n="s5dist">Trash-state distribution</h3><div id="trash"></div>
+    <h3 data-i18n="s5rng">Valid timestamp ranges</h3><div id="ranges"></div>
+    <h3 data-i18n="s5rec">Records marked Recently Deleted</h3>
+    <div class="row">
+        <input id="filter" data-i18n-ph="s5f" placeholder="Filter rows">
+        <select id="match"></select>
+    </div>
+    <p class="hint" id="deleted-count"></p>
+    <div id="deleted" class="scroll"></div>
+</section>
+
+<section id="step6" hidden>
+    <h2 data-i18n="s6h">Export &amp; report</h2>
+    <div class="cards" id="space"></div>
+    <div class="row">
+        <button id="export" class="primary" disabled data-i18n="s6exp">Export media and thumbnails</button>
+        <button data-open="reports" class="ghost" data-i18n="s6or">Open reports</button>
+        <button data-open="exports" class="ghost" data-i18n="s6oe">Open exports</button>
+    </div>
+    <p class="hint" data-i18n="s6hint">Files are copied to exports/&lt;domain&gt;/&lt;path&gt; with original extensions. Unsafe names are renamed and logged in reports/renamed_paths.csv.</p>
+    <div id="export-result"></div>
+    <h3 data-i18n="s6rem">Search for remnants</h3>
+    <p class="hint" data-i18n="s6remh">Searches the acquired data, not the phone's free space: unused space in Photos.sqlite for names of records that no longer exist, and caches for complete JPEG/PNG/HEIC/MOV/MP4 streams. Deleted files cannot be read back: iOS destroys each file's encryption key on deletion.</p>
+    <div class="row"><button id="carve" class="primary" disabled data-i18n="s6go">Search for remnants</button></div>
+    <div id="carve-result"></div>
+    <h3 data-i18n="s6cav">Caveats</h3>
+    <ul class="caveats">
+        <li data-i18n="cav1">Thumbnails are low-resolution derivatives, not full-resolution originals.</li>
+        <li data-i18n="cav2">A cached or thumbnail file without a matching original does not prove the original was deleted.</li>
+        <li data-i18n="cav3">Only items that were in Recently Deleted when the data was read are listed. Permanently deleted photos cannot be recovered.</li>
+        <li data-i18n="cav4">iCloud Photos, Optimize Storage and backup exclusions limit what exists locally.</li>
+    </ul>
+</section>
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>

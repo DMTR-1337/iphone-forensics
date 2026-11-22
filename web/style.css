@@ -1,0 +1,468 @@
+:root
+{
+    --paper: #eef1f4;
+    --surface: #ffffff;
+    --ink: #10202e;
+    --muted: #5c6b78;
+    --line: #d7dee4;
+    --signal: #b5700e;
+    --verify: #1f7a52;
+    --danger: #b0241c;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark)
+{
+    :root
+    {
+        --paper: #0c141c;
+        --surface: #121d27;
+        --ink: #dde5ec;
+        --muted: #8696a4;
+        --line: #26333f;
+        --signal: #e0901f;
+        --verify: #46b483;
+        --danger: #e36a60;
+    }
+}
+
+*
+{
+    box-sizing: border-box;
+}
+
+body
+{
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 400 15px/1.55 "IBM Plex Sans", system-ui, sans-serif;
+}
+
+header
+{
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 18px 28px 16px;
+}
+
+.mark
+{
+    font-weight: 600;
+    font-size: 19px;
+    letter-spacing: -0.015em;
+    margin-right: auto;
+}
+
+h2
+{
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+}
+
+h3
+{
+    font-size: 14px;
+    font-weight: 600;
+    margin: 26px 0 8px;
+}
+
+/* Step rail: the one bold element. Active = signal, done = ink, upcoming = muted outline */
+#steps
+{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 28px;
+    margin-bottom: 20px;
+}
+
+#steps button
+{
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    padding: 8px 20px 8px 0;
+    font: inherit;
+    cursor: pointer;
+}
+
+#steps button i
+{
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 1.5px solid var(--line);
+    border-radius: 2px;
+    font: 500 13px var(--mono);
+    font-style: normal;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+#steps button:not(:last-child)::after
+{
+    content: "";
+    width: 18px;
+    height: 1.5px;
+    background: var(--line);
+    margin-left: 2px;
+}
+
+#steps button:not([disabled]):hover i
+{
+    border-color: var(--ink);
+    color: var(--ink);
+}
+
+#steps button.active
+{
+    color: var(--ink);
+}
+
+#steps button.active i
+{
+    background: var(--signal);
+    border-color: var(--signal);
+    color: #fff;
+}
+
+#steps button.done i
+{
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+}
+
+#steps button[disabled]
+{
+    opacity: 0.55;
+    cursor: default;
+}
+
+main, #progress, #error
+{
+    max-width: 1080px;
+    margin: 0 28px;
+}
+
+section
+{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 26px 30px;
+    margin-bottom: 18px;
+}
+
+p
+{
+    margin: 0 0 12px;
+    max-width: 68ch;
+}
+
+/* Buttons: primary carries the signal, ghost is quiet */
+button.primary, button.ghost
+{
+    font: 500 14px "IBM Plex Sans", sans-serif;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button.primary
+{
+    border: 1px solid var(--signal);
+    background: var(--signal);
+    color: #fff;
+}
+
+button.primary:hover:not(:disabled)
+{
+    filter: brightness(1.07);
+}
+
+button.ghost
+{
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink);
+}
+
+button.ghost:hover
+{
+    border-color: var(--ink);
+}
+
+button:disabled
+{
+    opacity: 0.4;
+    cursor: default;
+}
+
+#lang
+{
+    padding: 5px 11px;
+    align-self: center;
+    font-variant-numeric: tabular-nums;
+}
+
+input, select
+{
+    font: inherit;
+    padding: 8px 11px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper);
+    color: var(--ink);
+    flex: 1;
+    min-width: 0;
+}
+
+input:focus, select:focus, button:focus-visible
+{
+    outline: 2px solid var(--signal);
+    outline-offset: 1px;
+}
+
+.row
+{
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+label
+{
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.hint
+{
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.alert
+{
+    border: 1px solid var(--signal);
+    border-left-width: 3px;
+    border-radius: 4px;
+    padding: 11px 15px;
+    margin: 14px 0;
+    font-size: 14px;
+}
+
+#error
+{
+    margin-bottom: 18px;
+}
+
+.bad
+{
+    color: var(--danger);
+    font-size: 13px;
+}
+
+.guide, .caveats
+{
+    max-width: 72ch;
+    padding-left: 20px;
+}
+
+.guide li, .caveats li
+{
+    margin-bottom: 9px;
+}
+
+.caveats
+{
+    color: var(--muted);
+    font-size: 14px;
+}
+
+body[data-os="windows"] [data-os="macos"], body[data-os="macos"] [data-os="windows"]
+{
+    display: none;
+}
+
+/* Progress */
+#progress
+{
+    margin-bottom: 14px;
+}
+
+.bar
+{
+    height: 4px;
+    background: var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.bar i
+{
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--signal);
+    transition: width 0.3s;
+}
+
+#phase
+{
+    font-size: 13px;
+    color: var(--muted);
+    display: inline-block;
+    margin-top: 6px;
+}
+
+pre
+{
+    font: 400 12px/1.5 var(--mono);
+    max-height: 190px;
+    overflow: auto;
+    color: var(--muted);
+}
+
+summary
+{
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+/* Selected-source list */
+dl
+{
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 5px 18px;
+    margin: 0 0 18px;
+    font-size: 14px;
+}
+
+dt
+{
+    color: var(--muted);
+}
+
+dd
+{
+    margin: 0;
+}
+
+/* Stat cards: value in mono, quiet frame, no drop shadow */
+.cards
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.card
+{
+    background: var(--surface);
+    padding: 13px 16px;
+}
+
+.card b
+{
+    display: block;
+    font: 500 21px var(--mono);
+    letter-spacing: -0.02em;
+}
+
+.card span
+{
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* Data tables */
+table
+{
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+}
+
+th, td
+{
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    word-break: break-word;
+}
+
+th
+{
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--ink);
+}
+
+.scroll
+{
+    overflow-x: auto;
+}
+
+/* Monospace where the cell content is a hash, path, number or timestamp */
+#hashes td, #ranges td, #deleted td, dd, code
+{
+    font-family: var(--mono);
+    font-size: 12px;
+}
+
+small
+{
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+}
+
+@media (max-width: 620px)
+{
+    header, #steps, main, #progress, #error
+    {
+        margin-left: 16px;
+        margin-right: 16px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    header
+    {
+        padding: 18px 16px 16px;
+    }
+
+    #steps
+    {
+        padding: 0 16px;
+    }
+
+    section
+    {
+        padding: 20px 18px;
+    }
+
+    #steps button span
+    {
+        display: none;
+    }
+}
